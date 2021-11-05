@@ -1,0 +1,6 @@
+{
+    "editor.formatOnSave": true,
+    "liveshare.allowGuestDebugControl": true,
+    "liveshare.allowGuestTaskControl": true,
+    "emmet.showSuggestionsAsSnippets": true
+}
