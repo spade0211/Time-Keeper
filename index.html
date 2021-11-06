@@ -461,7 +461,7 @@
     <!-- Javascript -->
     <script>
         //Defautl mode = 1 => time
-        var mode = 1;
+        var mode = 1, color = "#FC716C", revision, later = [];
         
         //Gives animations to the modes
         for(i of document.querySelectorAll('[class*=mode-]')){
@@ -475,11 +475,10 @@
         var icon = document.querySelector(".fas");
         icon.addEventListener("mousedown", showSettings); //clicking font-awesome settings opens
 
-        var color = "#FC716C";
         var colorClass = ".colour i:nth-child(1)";
         
         //Application starts with Time mode ON
-        const revision = time(); 
+        time(); 
         
         //Resets window when users leave the tab for more than 1 minute
         window.addEventListener("blur", () => {
@@ -581,14 +580,24 @@
         }
 
         function reset(){
+            let left = document.querySelector('.sem-left');
+            let right = document.querySelector('.sem-right');
             document.querySelector(".sem-left").classList.remove("rotate");
             document.querySelector(".sem-right").classList.remove("rotate");
-            document.querySelector('.sem-left').style.transition = "transform ease 0.5s";
-            document.querySelector('.sem-right').style.transition = "transform ease 0.5s";
+            left.style.transition = "transform ease 0.5s";
+            right.style.transition = "transform ease 0.5s";
+            left.style.backgroundColor = color;
+            right.style.backgroundColor = color;
+            left.style.zIndex = "400";
+            right.style.zIndex = "400";
+            left.style.transform = "rotate(0deg)";
+            right.style.transform = "rotate(180deg)";
             clearInterval(revision);
+            for(i of later)
+                clearTimeout(i);
             setTimeout(() => {
-                document.querySelector('.sem-left').style.transform = "rotate(0deg)";
-                document.querySelector('.sem-right').style.transform = "rotate(0deg)";
+                left.style.transform = "rotate(180deg)";
+                right.style.transform = "rotate(180deg)";
             }, 250);
         }
         function time() {
@@ -598,16 +607,15 @@
             updateSeconds();
             updateTime();
 
-            setTimeout(() => {
+            later[6] = setTimeout(() => {
                 updateTime();
-                setTimeout(changeMask, 30000);
+                later[0] = setTimeout(changeMask, 30000);
 
-                var revision = setInterval(function() {
+                revision = setInterval(function() {
+                    console.log("This is not happening right!!")
                     updateTime();
-                    setTimeout(changeMask, 30000);
+                    later[1] = setTimeout(changeMask, 30000);
                 }, 60000);
-                
-                return revision;
 
             }, (60 - time.getSeconds()) * 1000);
 
@@ -616,7 +624,7 @@
                 let time = new Date();
                 if ((seconds = time.getSeconds()) < 30) {
                     document.querySelector(".sem-right").style.animationDelay = (-1 * seconds) + "s";
-                    setTimeout(changeMask, (30 - seconds) * 1000);
+                    later[2] = setTimeout(changeMask, (30 - seconds) * 1000);
                 } else {
                     document.querySelector(".sem-right").style.animationDelay = (-1 * 30) + "s";
                     changeMask(false);
@@ -629,14 +637,14 @@
                     document.querySelector(".sem-left").style.backgroundColor = color;
                     document.querySelector(".sem-left").style.zIndex = 400;
                     document.querySelector(".sem-left").classList.add("rotate");
-                    setTimeout(reset, 30000);
+                    later[3] = setTimeout(reset, 30000);
                 } else {
                     let seconds;
                     document.querySelector(".sem-left").style.backgroundColor = color;
                     document.querySelector(".sem-left").style.zIndex = 400;
                     document.querySelector(".sem-left").classList.add("rotate");
                     document.querySelector(".sem-left").style.animationDelay = (30 - (seconds = time.getSeconds())) + "s";
-                    setTimeout(reset, (60 - seconds) * 1000);
+                    later[4] = setTimeout(reset, (60 - seconds) * 1000);
                 }
             }
 
@@ -662,7 +670,7 @@
                 document.querySelector(".sem-right").classList.remove("rotate");
 
                 document.querySelector(".sem-right").style.animationDelay = 55 + "ms";
-                setTimeout(function() {
+                later[5] = setTimeout(function() {
                     document.querySelector(".sem-right").classList.add("rotate");
                 }, 55);
             }
