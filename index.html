@@ -91,8 +91,8 @@
         
         .outer-circle {
             position: relative;
-            width: 50vh;
-            height: 50vh;
+            width: 47.5vh;
+            height: 47.5vh;
             background-color: #151932;
             border-radius: 100%;
         }
@@ -118,6 +118,7 @@
             background-color: #FC716C;
             border-radius: 400px 0 0 400px;
             transform-origin: right 50%;
+            transform: rotate(0deg);
         }
         
         .sem-left {
@@ -130,6 +131,7 @@
             background-color: #151932;
             border-radius: 0 400px 400px 0;
             transform-origin: left 50%;
+            transform: rotate(0deg);
         }
         
         .inner-circle {
@@ -280,8 +282,8 @@
         }
         
         .colour i:nth-child(3) {
-            background-color: #ffd700;
-            color: #ffd700;
+            background-color: #ff7300;
+            color: #ff7300;
         }
         
         .settings-apply {
@@ -458,24 +460,22 @@
         </div>
         <div class="settings-apply">Made by Aryan</div>
     </div>
+    
     <!-- Javascript -->
     <script>
-        //Defautl mode = 1 => time
-        var mode = 1, color = "#FC716C", revision, later = [];
+        //Global Variables, (Defautl mode = 1 => time)
+        var mode = 1, color = "#FC716C", revision, later = [], var colorClass = ".colour i:nth-child(1)";
         
         //Gives animations to the modes
         for(i of document.querySelectorAll('[class*=mode-]')){
-            i.addEventListener('mouseenter', hoverColor);
-            i.addEventListener('mouseleave', unhoverColor);
+            // i.addEventListener('mouseenter', hoverColor);
+            // i.addEventListener('mouseleave', unhoverColor);
             i.addEventListener('click', clickColor);
         }
-        
     
         //Gives settings icon access to settings
         var icon = document.querySelector(".fas");
         icon.addEventListener("mousedown", showSettings); //clicking font-awesome settings opens
-
-        var colorClass = ".colour i:nth-child(1)";
         
         //Application starts with Time mode ON
         time(); 
@@ -582,24 +582,37 @@
         function reset(){
             let left = document.querySelector('.sem-left');
             let right = document.querySelector('.sem-right');
-            document.querySelector(".sem-left").classList.remove("rotate");
-            document.querySelector(".sem-right").classList.remove("rotate");
             left.style.transition = "transform ease 0.5s";
             right.style.transition = "transform ease 0.5s";
-            left.style.backgroundColor = color;
-            right.style.backgroundColor = color;
-            left.style.zIndex = "400";
-            right.style.zIndex = "400";
-            left.style.transform = "rotate(0deg)";
-            right.style.transform = "rotate(180deg)";
+            
+            let rAngle = -(Math.asin(parseFloat(window.getComputedStyle(document.querySelector('.sem-right')).transform.split('(')[1].split(',')[0])) * (180 / Math.PI) - 90);
+            let lAngle = -(Math.asin(parseFloat(window.getComputedStyle(document.querySelector('.sem-left')).transform.split('(')[1].split(',')[0])) * (180 / Math.PI) - 90);          
+            
+            left.style.transform = "rotate(" + lAngle + "deg)";
+            right.style.transform = "rotate(" + rAngle + "deg)";
+            
+            // document.querySelector(".sem-left").style.animationPlayState = "paused";
+            // document.querySelector(".sem-left").style.animationPlayState = "paused";
+            document.querySelector(".sem-right").classList.remove("rotate");
+            document.querySelector(".sem-left").classList.remove("rotate");
             clearInterval(revision);
             for(i of later)
                 clearTimeout(i);
+            
+            left.style.transform = "rotate(" + 0 + "deg)";
             setTimeout(() => {
-                left.style.transform = "rotate(180deg)";
-                right.style.transform = "rotate(180deg)";
-            }, 250);
+                left.style.opacity = "0";
+                right.style.transform = "rotate(" + 0 + "deg)";
+            }, 500);
+            
+            i = parseInt(document.querySelector(".time").innerHTML.split(":")[0]);
+            j = parseInt(document.querySelector(".time").innerHTML.split(":")[1]);
+            k = Math.max(i, j);
+            let recurse;
+            setTimeout(() => recurse = setInterval(() => document.querySelector(".time").innerHTML = (i ? ("0" + --i).slice(-2) : ("0" + i).slice(-2)) + ":" + (j ? ("0" + --j).slice(-2) : ("0" + j).slice(-2)), 100 / Math.sqrt(k)), 500);
+            clearInterval(recurse, k*21);
         }
+
         function time() {
             var time = new Date();
 
