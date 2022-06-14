@@ -277,8 +277,8 @@
         }
         
         .colour i:nth-child(2) {
-            background-color: #008000;
-            color: #008000;
+            background-color: #ccff02;
+            color: #ccff02;
         }
         
         .colour i:nth-child(3) {
@@ -475,7 +475,18 @@
     
         //Gives settings icon access to settings
         var icon = document.querySelector(".fas");
+        var mstopwatch = document.querySelector(".mode-2");
+        var mtime = document.querySelector(".mode-1");
         icon.addEventListener("mousedown", showSettings); //clicking font-awesome settings opens
+        mstopwatch.addEventListener("click", sstopwatch);
+        mtime.addEventListener("click", stime);
+        function sstopwatch(){
+            setTimeout(reset, 200);
+        }
+        function stime(){
+            setTimeout(reset, 200);
+            setTimeout(time, 2000);
+        }
         
         //Application starts with Time mode ON
         time(); 
@@ -608,15 +619,22 @@
             i = parseInt(document.querySelector(".time").innerHTML.split(":")[0]);
             j = parseInt(document.querySelector(".time").innerHTML.split(":")[1]);
             k = Math.max(i, j);
-            let recurse;
-            setTimeout(() => recurse = setInterval(() => document.querySelector(".time").innerHTML = (i ? ("0" + --i).slice(-2) : ("0" + i).slice(-2)) + ":" + (j ? ("0" + --j).slice(-2) : ("0" + j).slice(-2)), 100 / Math.sqrt(k)), 500);
-            clearInterval(recurse, k*21);
+            var recurse = 0;
+            setTimeout(() => {
+                recurse = setInterval(() => {
+                    document.querySelector(".time").innerHTML = (i ? ("0" + --i).slice(-2) : ("0" + i).slice(-2)) + ":" + (j ? ("0" + --j).slice(-2) : ("0" + j).slice(-2)); 
+                }, 100 / Math.sqrt(k))
+            }, 500);
+            setTimeout(() => {
+                clearInterval(recurse);
+            }, 500 + 200*Math.sqrt(k));
         }
 
         function time() {
-            var time = new Date();
+            document.querySelector('.sem-left').style.opacity = ""; // necessary evil, i dindnt wanna think too hard
+            let time = new Date();
 
-            document.querySelector(".sem-right").classList.add("rotate");
+            // document.querySelector(".sem-right").classList.add("rotate");
             updateSeconds();
             updateTime();
 
@@ -635,11 +653,47 @@
             function updateSeconds() {
                 let seconds;
                 let time = new Date();
-                if ((seconds = time.getSeconds()) < 30) {
-                    document.querySelector(".sem-right").style.animationDelay = (-1 * seconds) + "s";
-                    later[2] = setTimeout(changeMask, (30 - seconds) * 1000);
-                } else {
-                    document.querySelector(".sem-right").style.animationDelay = (-1 * 30) + "s";
+                if ((seconds = time.getSeconds()) <= 29) {
+                    document.querySelector(".sem-right").style.transform = "rotate(0deg)";
+
+                    for (i of document.querySelectorAll('[class*=sem-]'))
+                        i.style.transition = "all 1s ease-in-out";
+
+                    setTimeout(() => {
+                        document.querySelector(".sem-right").style.transform = "rotate(" + ((seconds + 1.25) * 6) + "deg)"
+                        setTimeout(() => {
+                            document.querySelector(".sem-right").classList.add("rotate");
+                            document.querySelector(".sem-right").style.animationDelay = (-1 * (seconds + 1.25)) + "s";
+                            document.querySelector(".sem-right").style.transform = "rotate(0deg)"
+                            for (i of document.querySelectorAll('[class*=sem-]'))
+                                i.style.transition = "";
+                        }, 1000);
+                    }, 250);
+
+                    later[2] = setTimeout(changeMask, (30 - (seconds)) * 1000);
+                } 
+                
+                else if(seconds > 57)
+                    setTimeout(updateSeconds, (61 - seconds)*1000);
+
+                else {
+                    // document.querySelector(".sem-right").style.animationDelay = (-1 * 30) + "s";
+
+                    document.querySelector(".sem-right").style.transform = "rotate(0deg)";
+
+                    document.querySelector('.sem-right').style.transition = "all 1s ease-in";
+
+                    setTimeout(() => {
+                        document.querySelector(".sem-right").style.transform = "rotate(180deg)"
+                        setTimeout(() => {
+                            document.querySelector(".sem-right").classList.add("rotate");
+                            document.querySelector(".sem-right").style.animationDelay = (-1 * (30 - 1.25)) + "s";
+                            document.querySelector('.sem-right').style.transition = "";
+                            document.querySelector(".sem-right").style.transform = "rotate(0deg)"
+                            // for (i of document.querySelectorAll('[class*=sem-]'))
+                            //     i.style.transition = "";
+                        }, 1000);
+                    }, 250);
                     changeMask(false);
                 }
             }
@@ -652,12 +706,59 @@
                     document.querySelector(".sem-left").classList.add("rotate");
                     later[3] = setTimeout(reset, 30000);
                 } else {
-                    let seconds;
-                    document.querySelector(".sem-left").style.backgroundColor = color;
+                    let seconds = time.getSeconds();
+                    // document.querySelector(".sem-left").style.zIndex = 400;
+                    // // document.querySelector(".sem-left").style.backgroundColor = color;
+                    // document.querySelector(".sem-left").style.background = "linear-gradient(to bottom, #ffffff00 25%, " + color + " 75%)";
+                    // document.querySelector(".sem-left").style.backgroundSize = "400% 400%";
+                    // document.querySelector(".sem-left").style.backgroundPosition = "0% 0%";
+                    // // document.querySelector(".sem-left").style.background = "linear-gradient(to bottom, " + color + "50%, #ffffff00 50%)";
+                    // // document.querySelector(".sem-left").classList.add("rotate");
+                    // // document.querySelector(".sem-left").style.animationDelay = (30 - (seconds = time.getSeconds())) + "s";
+                    // // document.querySelector(".sem-left").style.transform = "rotate(-180deg)";
+                    // document.querySelector(".sem-left").style.transform = "rotate(0deg)";
+                    // document.querySelector('.sem-left').style.transition = "all 1s ease-in, background-position 0.75s ease-in";
                     document.querySelector(".sem-left").style.zIndex = 400;
-                    document.querySelector(".sem-left").classList.add("rotate");
-                    document.querySelector(".sem-left").style.animationDelay = (30 - (seconds = time.getSeconds())) + "s";
-                    later[4] = setTimeout(reset, (60 - seconds) * 1000);
+                    // document.querySelector(".sem-left").style.backgroundColor = color;
+                    document.querySelector(".sem-left").style.background = "linear-gradient(to top, #ffffff00 25%, " + color + " 75%)";
+                    document.querySelector(".sem-left").style.backgroundSize = "400% 400%";
+                    document.querySelector(".sem-left").style.backgroundPosition = "0% 100%";
+                    // document.querySelector(".sem-left").style.background = "linear-gradient(to bottom, " + color + "50%, #ffffff00 50%)";
+                    // document.querySelector(".sem-left").classList.add("rotate");
+                    // document.querySelector(".sem-left").style.animationDelay = (30 - (seconds = time.getSeconds())) + "s";
+                    // document.querySelector(".sem-left").style.transform = "rotate(-180deg)";
+                    document.querySelector(".sem-left").style.transform = "rotate(0deg)";
+                    document.querySelector('.sem-left').style.transition = "all 1s ease-in, background-position 1.7s ease-in";
+                    setTimeout(() => {
+                        // document.querySelector(".sem-left").style.transform = "rotate(0deg)"
+                        document.querySelector(".sem-left").style.backgroundPosition = "0% 0%";
+                    }, 250);
+                    // setTimeout(() => {
+                    //     document.querySelector(".sem-left").style.transform = "rotate(0deg)";
+                    //     document.querySelector(".sem-left").style.zIndex = 400;
+                    // // }, 400);
+                    // setTimeout(() => {
+                    //     document.querySelector(".sem-left").style.zIndex = 400;
+                        
+                    // }, 500);
+                    setTimeout(() => {
+                        // document.querySelector('.sem-left').style.transition = "all 1.5s ease-out";
+                        document.querySelector(".sem-left").style.transform = "rotate(" + -((30 - (seconds + 1.25 + 1)) * 6) + "deg)";
+                        setTimeout(() => {
+                            document.querySelector(".sem-left").style.background = "";
+                            document.querySelector(".sem-left").style.backgroundColor = color;
+                            document.querySelector(".sem-left").classList.add("rotate");
+                            document.querySelector(".sem-left").style.animationDelay = (30 - (seconds + 1.25 + 1)) + "s";
+                            document.querySelector(".sem-left").style.transform = "rotate(0deg)"
+                            document.querySelector(".sem-left").style.backgroundSize = "100% 10%%";
+                            document.querySelector(".sem-left").style.backgroundPosition = "0% 0%";
+                            console.log(document.querySelector('.sem-left').style)
+                            for (i of document.querySelectorAll('[class*=sem-]'))
+                                i.style.transition = "";
+                        }, 1000);
+                    }, 1250);
+
+                    later[4] = setTimeout(reset, (60 - (seconds)) * 1000);
                 }
             }
 
@@ -676,7 +777,8 @@
             }
 
             function reset() {
-                document.querySelector(".sem-left").style.backgroundColor = "#151932";
+                circleColor = window.getComputedStyle(document.querySelector('.inner-circle')).backgroundColor;
+                document.querySelector(".sem-left").style.backgroundColor = circleColor;
                 document.querySelector(".sem-left").style.zIndex = 100;
                 document.querySelector(".sem-left").style.animationDelay = 0 + "s";
                 document.querySelector(".sem-left").classList.remove("rotate");
