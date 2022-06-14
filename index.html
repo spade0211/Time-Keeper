@@ -149,7 +149,8 @@
             font-size: 16vh;
             text-align: center;
             font-weight: 400;
-            color: rgb(206, 203, 203);
+            /* color: rgb(206, 203, 203); */
+            color: white;
             font-family: 'Passion One', 'Times New Roman', Times, serif;
             position: relative;
             bottom: 20px;
@@ -593,19 +594,19 @@
         function reset(){
             let left = document.querySelector('.sem-left');
             let right = document.querySelector('.sem-right');
+            
+            let getAngle = (div) => -(Math.asin(parseFloat(window.getComputedStyle(div).transform.split('(')[1].split(',')[0])) * (180 / Math.PI) - 90);
+            let rAngle = getAngle(right);
+            let lAngle = getAngle(left);
+            
             left.style.transition = "transform ease 0.5s";
             right.style.transition = "transform ease 0.5s";
-            
-            let rAngle = -(Math.asin(parseFloat(window.getComputedStyle(document.querySelector('.sem-right')).transform.split('(')[1].split(',')[0])) * (180 / Math.PI) - 90);
-            let lAngle = -(Math.asin(parseFloat(window.getComputedStyle(document.querySelector('.sem-left')).transform.split('(')[1].split(',')[0])) * (180 / Math.PI) - 90);          
-            
             left.style.transform = "rotate(" + lAngle + "deg)";
             right.style.transform = "rotate(" + rAngle + "deg)";
-            
-            // document.querySelector(".sem-left").style.animationPlayState = "paused";
-            // document.querySelector(".sem-left").style.animationPlayState = "paused";
-            document.querySelector(".sem-right").classList.remove("rotate");
-            document.querySelector(".sem-left").classList.remove("rotate");
+            left.classList.remove("rotate");
+            right.classList.remove("rotate");
+            // left.style.animationPlayState = "paused";
+            // right.style.animationPlayState = "paused";
             clearInterval(revision);
             for(i of later)
                 clearTimeout(i);
@@ -631,10 +632,13 @@
         }
 
         function time() {
-            document.querySelector('.sem-left').style.opacity = ""; // necessary evil, i dindnt wanna think too hard
             let time = new Date();
+            let left = document.querySelector('.sem-left');
+            let right = document.querySelector('.sem-right');
 
+            left.style.opacity = ""; // necessary evil, i dindnt wanna think too hard
             // document.querySelector(".sem-right").classList.add("rotate");
+
             updateSeconds();
             updateTime();
 
@@ -643,30 +647,26 @@
                 later[0] = setTimeout(changeMask, 30000);
 
                 revision = setInterval(function() {
-                    console.log("This is not happening right!!")
                     updateTime();
                     later[1] = setTimeout(changeMask, 30000);
                 }, 60000);
-
             }, (60 - time.getSeconds()) * 1000);
 
             function updateSeconds() {
-                let seconds;
                 let time = new Date();
-                if ((seconds = time.getSeconds()) <= 29) {
-                    document.querySelector(".sem-right").style.transform = "rotate(0deg)";
+                let seconds = time.getSeconds();
 
-                    for (i of document.querySelectorAll('[class*=sem-]'))
-                        i.style.transition = "all 1s ease-in-out";
+                if (seconds  <= 29) {
+                    right.style.transform = "rotate(0deg)";
+                    right.style.transition = "all 1s ease-in-out";
 
                     setTimeout(() => {
-                        document.querySelector(".sem-right").style.transform = "rotate(" + ((seconds + 1.25) * 6) + "deg)"
+                        right.style.transform = "rotate(" + ((seconds + 1.25) * 6) + "deg)"
                         setTimeout(() => {
-                            document.querySelector(".sem-right").classList.add("rotate");
-                            document.querySelector(".sem-right").style.animationDelay = (-1 * (seconds + 1.25)) + "s";
-                            document.querySelector(".sem-right").style.transform = "rotate(0deg)"
-                            for (i of document.querySelectorAll('[class*=sem-]'))
-                                i.style.transition = "";
+                            right.classList.add("rotate");
+                            right.style.animationDelay = (-1 * (seconds + 1.25)) + "s";
+                            right.style.transform = "rotate(0deg)"
+                            right.style.transition = "";
                         }, 1000);
                     }, 250);
 
@@ -677,21 +677,18 @@
                     setTimeout(updateSeconds, (61 - seconds)*1000);
 
                 else {
+                    right.style.transform = "rotate(0deg)";
+                    right.style.transition = "all 1s ease-in";
                     // document.querySelector(".sem-right").style.animationDelay = (-1 * 30) + "s";
 
-                    document.querySelector(".sem-right").style.transform = "rotate(0deg)";
-
-                    document.querySelector('.sem-right').style.transition = "all 1s ease-in";
 
                     setTimeout(() => {
-                        document.querySelector(".sem-right").style.transform = "rotate(180deg)"
+                        right.style.transform = "rotate(174deg)"
                         setTimeout(() => {
-                            document.querySelector(".sem-right").classList.add("rotate");
-                            document.querySelector(".sem-right").style.animationDelay = (-1 * (30 - 1.25)) + "s";
-                            document.querySelector('.sem-right').style.transition = "";
-                            document.querySelector(".sem-right").style.transform = "rotate(0deg)"
-                            // for (i of document.querySelectorAll('[class*=sem-]'))
-                            //     i.style.transition = "";
+                            right.classList.add("rotate");
+                            right.style.animationDelay = (-1 * (30 - 1.25)) + "s";
+                            right.style.transform = "rotate(0deg)"
+                            right.style.transition = "";
                         }, 1000);
                     }, 250);
                     changeMask(false);
@@ -700,61 +697,39 @@
 
             function changeMask(mask = true) {
                 let time = new Date();
+                
                 if (mask) {
-                    document.querySelector(".sem-left").style.backgroundColor = color;
-                    document.querySelector(".sem-left").style.zIndex = 400;
-                    document.querySelector(".sem-left").classList.add("rotate");
+                    left.style.backgroundColor = color;
+                    left.style.zIndex = 400;
+                    left.classList.add("rotate");
+
                     later[3] = setTimeout(reset, 30000);
-                } else {
+                } 
+                
+                else {
                     let seconds = time.getSeconds();
-                    // document.querySelector(".sem-left").style.zIndex = 400;
-                    // // document.querySelector(".sem-left").style.backgroundColor = color;
-                    // document.querySelector(".sem-left").style.background = "linear-gradient(to bottom, #ffffff00 25%, " + color + " 75%)";
-                    // document.querySelector(".sem-left").style.backgroundSize = "400% 400%";
-                    // document.querySelector(".sem-left").style.backgroundPosition = "0% 0%";
-                    // // document.querySelector(".sem-left").style.background = "linear-gradient(to bottom, " + color + "50%, #ffffff00 50%)";
-                    // // document.querySelector(".sem-left").classList.add("rotate");
-                    // // document.querySelector(".sem-left").style.animationDelay = (30 - (seconds = time.getSeconds())) + "s";
-                    // // document.querySelector(".sem-left").style.transform = "rotate(-180deg)";
-                    // document.querySelector(".sem-left").style.transform = "rotate(0deg)";
-                    // document.querySelector('.sem-left').style.transition = "all 1s ease-in, background-position 0.75s ease-in";
-                    document.querySelector(".sem-left").style.zIndex = 400;
-                    // document.querySelector(".sem-left").style.backgroundColor = color;
-                    document.querySelector(".sem-left").style.background = "linear-gradient(to top, #ffffff00 25%, " + color + " 75%)";
-                    document.querySelector(".sem-left").style.backgroundSize = "400% 400%";
-                    document.querySelector(".sem-left").style.backgroundPosition = "0% 100%";
-                    // document.querySelector(".sem-left").style.background = "linear-gradient(to bottom, " + color + "50%, #ffffff00 50%)";
-                    // document.querySelector(".sem-left").classList.add("rotate");
-                    // document.querySelector(".sem-left").style.animationDelay = (30 - (seconds = time.getSeconds())) + "s";
-                    // document.querySelector(".sem-left").style.transform = "rotate(-180deg)";
-                    document.querySelector(".sem-left").style.transform = "rotate(0deg)";
-                    document.querySelector('.sem-left').style.transition = "all 1s ease-in, background-position 1.7s ease-in";
+                    
+                    left.style.zIndex = 400;
+                    left.style.background = "linear-gradient(to top, #ffffff00 25%, " + color + " 75%)";
+                    left.style.backgroundSize = "400% 400%";
+                    left.style.backgroundPosition = "0% 100%";
+                    left.style.transform = "rotate(0deg)";
+                    left.style.transition = "all 1s ease-out, background-position 1.7s ease-in";
+                    
+                    setTimeout(() => left.style.backgroundPosition = "0% 0%",  250);
+
                     setTimeout(() => {
-                        // document.querySelector(".sem-left").style.transform = "rotate(0deg)"
-                        document.querySelector(".sem-left").style.backgroundPosition = "0% 0%";
-                    }, 250);
-                    // setTimeout(() => {
-                    //     document.querySelector(".sem-left").style.transform = "rotate(0deg)";
-                    //     document.querySelector(".sem-left").style.zIndex = 400;
-                    // // }, 400);
-                    // setTimeout(() => {
-                    //     document.querySelector(".sem-left").style.zIndex = 400;
-                        
-                    // }, 500);
-                    setTimeout(() => {
-                        // document.querySelector('.sem-left').style.transition = "all 1.5s ease-out";
-                        document.querySelector(".sem-left").style.transform = "rotate(" + -((30 - (seconds + 1.25 + 1)) * 6) + "deg)";
+                        left.style.transform = "rotate(" + -((30 - (seconds + 1.25 + 1)) * 6) + "deg)";
+
                         setTimeout(() => {
-                            document.querySelector(".sem-left").style.background = "";
-                            document.querySelector(".sem-left").style.backgroundColor = color;
-                            document.querySelector(".sem-left").classList.add("rotate");
-                            document.querySelector(".sem-left").style.animationDelay = (30 - (seconds + 1.25 + 1)) + "s";
-                            document.querySelector(".sem-left").style.transform = "rotate(0deg)"
-                            document.querySelector(".sem-left").style.backgroundSize = "100% 10%%";
-                            document.querySelector(".sem-left").style.backgroundPosition = "0% 0%";
-                            console.log(document.querySelector('.sem-left').style)
-                            for (i of document.querySelectorAll('[class*=sem-]'))
-                                i.style.transition = "";
+                            left.style.background = "";
+                            left.style.backgroundColor = color;
+                            left.classList.add("rotate");
+                            left.style.animationDelay = (30 - (seconds + 1.25 + 1)) + "s";
+                            left.style.transform = "rotate(0deg)"
+                            left.style.backgroundSize = "100% 100%";
+                            left.style.backgroundPosition = "0% 0%";
+                            left.style.transition = "";
                         }, 1000);
                     }, 1250);
 
@@ -763,34 +738,51 @@
             }
 
             function updateTime() {
-                let time = new Date();
-                if ((hours = time.getHours()) < 10)
-                    document.querySelector(".time").innerHTML = "0" + hours + ":";
-                else document.querySelector(".time").innerHTML = hours + ":";
-
-                if ((minutes = time.getMinutes()) < 10)
-                    document.querySelector(".time").append("0" + minutes);
-                else document.querySelector(".time").append(minutes);
-
+                let date = new Date();
+                let time = document.querySelector(".time");
                 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-                document.querySelector(".info").innerHTML = time.getDate() + " / " + monthNames[time.getMonth()];
+                document.querySelector(".info").innerHTML = date.getDate() + " / " + monthNames[date.getMonth()];
+
+                // if ((hours = date.getHours()) < 10)
+                //     time.innerHTML = "0" + hours + ":";
+                // else 
+                //     time.innerHTML = hours + ":";
+
+                // if ((minutes = date.getMinutes()) < 10)
+                //     time.append("0" + minutes);
+                // else 
+                //     time.append(minutes);
+
+                let hours = date.getHours();
+                let minutes = date.getMinutes();
+
+                i = parseInt(document.querySelector(".time").innerHTML.split(":")[0]);
+                j = parseInt(document.querySelector(".time").innerHTML.split(":")[1]);
+                k = Math.max(hours, minutes);
+                var recurse = 0;
+                setTimeout(() => {
+                    recurse = setInterval(() => {
+                        document.querySelector(".time").innerHTML = (i < hours ? ("0" + ++i).slice(-2) : ("0" + i).slice(-2)) + ":" + (j < minutes ? ("0" + ++j).slice(-2) : ("0" + j).slice(-2)); 
+                    }, 100 / Math.sqrt(k))
+                }, 500);
+                setTimeout(() => {
+                    clearInterval(recurse);
+                }, 500 + 200*Math.sqrt(k));
             }
 
             function reset() {
                 circleColor = window.getComputedStyle(document.querySelector('.inner-circle')).backgroundColor;
-                document.querySelector(".sem-left").style.backgroundColor = circleColor;
-                document.querySelector(".sem-left").style.zIndex = 100;
-                document.querySelector(".sem-left").style.animationDelay = 0 + "s";
-                document.querySelector(".sem-left").classList.remove("rotate");
-                document.querySelector(".sem-right").classList.remove("rotate");
+                
+                left.style.backgroundColor = circleColor;
+                left.style.zIndex = 100;
+                left.style.animationDelay = 0 + "s";
+                left.classList.remove("rotate");
+                right.classList.remove("rotate");
+                right.style.animationDelay = 55 + "ms";
 
-                document.querySelector(".sem-right").style.animationDelay = 55 + "ms";
-                later[5] = setTimeout(function() {
-                    document.querySelector(".sem-right").classList.add("rotate");
-                }, 55);
+                later[5] = setTimeout(() => document.querySelector(".sem-right").classList.add("rotate"), 55);
             }
         }
     </script>
 </body>
-
 </html>
